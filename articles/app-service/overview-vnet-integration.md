@@ -126,10 +126,10 @@ Through application routing or configuration routing options, you can configure 
 
 ### Application routing
 
-Application routing applies to traffic that is sent from your app after it starts. See [configuration routing](#configuration-routing) for traffic during startup. When you configure application routing, you can either route all traffic or only private traffic (also known as [RFC1918](https://datatracker.ietf.org/doc/html/rfc1918#section-3) traffic) into your virtual network. You configure this behavior through the outbound internet traffic setting. If outbound internet traffic routing is disabled, your app only routes private traffic into your virtual network. If you want to route all your outbound app traffic into your virtual network, make sure that outbound internet traffic is enabled.
+Application routing applies to traffic that is sent from your app after it starts. See [configuration routing](#configuration-routing) for traffic during startup. When you configure application routing, you can either route all traffic or only private traffic (also known as [RFC1918](https://datatracker.ietf.org/doc/html/rfc1918#section-3) traffic) into your virtual network. You configure this behavior through the `Outbound internet traffic` setting. If `Outbound internet traffic` routing is disabled, your app only routes private traffic into your virtual network. If you want to route all your outbound app traffic into your virtual network, make sure that `Outbound internet traffic` is enabled.
 
 * Only traffic configured in application or configuration routing is subject to the NSGs and UDRs that are applied to your integration subnet.
-* When outbound internet traffic routing is enabled, the source address for your outbound traffic from your app is still one of the IP addresses that are listed in your app properties. If you route your traffic through a firewall or a NAT gateway, the source IP address originates from this service.
+* When outbound `Outbound internet traffic` routing is enabled, the source address for your outbound traffic from your app is still one of the IP addresses that are listed in your app properties. If you route your traffic through a firewall or a NAT gateway, the source IP address originates from this service.
 
 Learn [how to configure application routing](./configure-vnet-integration-routing.md#configure-application-routing).
 
@@ -142,7 +142,7 @@ When you're using virtual network integration, you can configure how parts of th
 
 #### Content share
 
-By default, Azure Functions uses a [content share](./../azure-functions/configure-networking-how-to.md#restrict-your-storage-account-to-a-virtual-network) as the deployment source when scaling function apps in a Premium plan. You must configure an extra setting to guarantee traffic is routed to this content share through the virtual network integration. For more information, see [how to configure content share routing](./configure-vnet-integration-routing.md#content-share). 
+By default, Azure Functions uses a [content share](./../azure-functions/configure-networking-how-to.md#restrict-your-storage-account-to-a-virtual-network) as the deployment source when scaling function apps in a Premium plan. You must configure an extra setting to guarantee traffic is routed to this content share through the virtual network integration. For more information, see [how to configure content share routing](./configure-vnet-integration-routing.md#content-share).
 
 In addition to configuring the routing, you must also ensure that any firewall or Network Security Group configured on traffic from the subnet allow traffic to port 443 and 445.
 
@@ -164,7 +164,7 @@ App settings using Key Vault references attempt to get secrets over the public r
 
 ### Routing app settings
 
-App Service has existing app settings to configure application and configuration routing. Site properties override the app settings if both exist. Site properties have the advantage of being auditable with Azure Policy and validated at the time of configuration. We recommend you to use site properties. 
+App Service has existing app settings to configure application and configuration routing. Site properties override the app settings if both exist. Site properties have the advantage of being auditable with Azure Policy and validated at the time of configuration. We recommend you to use site properties.
 
 You can still use the existing `WEBSITE_VNET_ROUTE_ALL` app setting to configure application routing.
 
@@ -178,7 +178,7 @@ Route tables and network security groups only apply to traffic routed through th
 
 When configuring network security groups or route tables that applies to outbound traffic, you must make sure you consider your application dependencies. Application dependencies include endpoints that your app needs during runtime. Besides APIs and services the app is calling, these endpoints could also be derived endpoints like certificate revocation list (CRL) check endpoints and identity/authentication endpoint, for example Microsoft Entra ID. If you're using [continuous deployment in App Service](./deploy-continuous-deployment.md), you might also need to allow endpoints depending on type and language. Specifically for [Linux continuous deployment](https://github.com/microsoft/Oryx/blob/main/doc/hosts/appservice.md#network-dependencies), you need to allow `oryx-cdn.microsoft.io:443`. For Python you additionally need to allow `files.pythonhosted.org`, `pypi.org`.
 
-Azure uses UDP port 30,000 to do network health checks. If you block this traffic, it will not directly impact your app, but it will be more difficult for Azure support to detect and troubleshoot network related issues. 
+Azure uses UDP port 30,000 to do network health checks. If you block this traffic, it will not directly impact your app, but it will be more difficult for Azure support to detect and troubleshoot network related issues.
 
 When you want to route outbound traffic on-premises, you can use a route table to send outbound traffic to your Azure ExpressRoute gateway. If you do route traffic to a gateway, set routes in the external network to send any replies back. Border Gateway Protocol (BGP) routes also affect your app traffic. If you have BGP routes from something like an ExpressRoute gateway, your app outbound traffic is affected. Similar to user-defined routes, BGP routes affect traffic according to your routing scope setting.
 
@@ -250,13 +250,13 @@ The feature is easy to set up, but that doesn't mean your experience is problem 
 
 ### Deleting the App Service plan or app before disconnecting the network integration
 
-If you deleted the app or the App Service plan without disconnecting the virtual network integration first, you aren't able to do any update/delete operations on the virtual network or subnet that was used for the integration with the deleted resource. A subnet delegation 'Microsoft.Web/serverFarms' remains assigned to your subnet and prevents the update and delete operations. 
+If you deleted the app or the App Service plan without disconnecting the virtual network integration first, you aren't able to do any update/delete operations on the virtual network or subnet that was used for the integration with the deleted resource. A subnet delegation 'Microsoft.Web/serverFarms' remains assigned to your subnet and prevents the update and delete operations.
 
 In order to do update/delete the subnet or virtual network again, you need to re-create the virtual network integration, and then disconnect it:
 1. Re-create the App Service plan and app (it's mandatory to use the exact same web app name as before).
-1. Navigate to **Networking** on the app in Azure portal and configure the virtual network integration. 
+1. Navigate to **Networking** on the app in Azure portal and configure the virtual network integration.
 1. After the virtual network integration is configured, select the 'Disconnect' button.
-1. Delete the App Service plan or app. 
+1. Delete the App Service plan or app.
 1. Update/Delete the subnet or virtual network.
 
 If you still encounter issues with the virtual network integration after following these steps, contact Microsoft Support.
